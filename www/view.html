@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="UTF-8">
+    <title>Rocon - Semantic Annotator</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- ROS related -->
+    <script type="text/javascript" src="js/easeljs/easeljs.js"></script>
+    <script type="text/javascript" src="js/eventemitter2/eventemitter2.js"></script>
+    <script type="text/javascript" src="js/ros/roslib.js"></script>
+    <script type="text/javascript" src="js/ros/ros2d.js"></script>
+    <script type="text/javascript" src="js/ros/nav2d.js"></script>
+    <script type="text/javascript" src="js/annotator/annotator.js"></script>
+    <script type="text/javascript" src="js/annotator/circle.js"></script>
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet"></link>
+    <link href="css/bootstrap-button.css" rel="stylesheet"></link>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap/bootstrap.js"></script>
+    <script src="js/bootstrap/bootstrap-button.js"></script>
+
+
+    <link href="css/bootstrap-responsive.css" rel="stylesheet"></link>
+
+    <script type="text/javascript">
+      var ros = new ROSLIB.Ros();
+      var defaultUrL = 'ws://localhost:9090';
+      var viewer;
+
+      $().ready(function(e) {
+
+        initHeader();
+        initViewer()
+      });
+
+      function initHeader()
+      {
+        settingROSCallbacks();
+
+        ros.connect(defaultUrL);
+
+        $('#connectbtn').on('click',function(e) {
+            var va = $('#focusedInput').val();
+            ros.connect(va);
+            return false;
+        });
+      }
+
+      function initViewer() {
+
+        viewer = createViewer();
+        gridClient = addMap(viewer);
+        addNavigator(viewer,gridClient);
+        addAnnotator(viewer,gridClient);
+      }
+
+      function createViewer() {
+        div = $('#view');
+        div.css('margin','10pt');
+
+        var width = div.width() - 30;
+        var half_window = $(window).height()/2;
+        var height = half_window < 500?500:half_window;
+
+        viewer = new ROS2D.Viewer({
+          divID : 'view',
+          width: width,
+          height: height,
+          background: '#DDDDDD'
+        });
+
+        $(window).resize(function(e) {
+          var half_window = $(window).height()/2;
+          var height = half_window < 500?500:half_window;
+
+          viewer.resizeCanvas(div.width()-30,height);
+        });
+
+        return viewer;
+      }
+
+      function addMap(viewer) {
+        var continuous = true;
+
+        var gridClient = new ROS2D.OccupancyGridClient({
+          ros : ros,
+          rootObject : viewer.scene,
+          continuous : continuous,
+        });
+
+        // Scale the canvas to fit to the map
+        gridClient.on('change', function(map_origin) {
+          viewer.scaleToDimensions(gridClient.currentGrid.width, gridClient.currentGrid.height);
+        });
+        return gridClient;
+      }
+
+      function addNavigator(viewer,gridClient) {
+        var serverName = '/move_base'
+        var actionName = 'move_base_msgs/MoveBaseAction';
+        var navigator;
+        
+
+        gridClient.on('change', function(map_origin) {
+          navigator= new NAV2D.Navigator({
+            ros: ros,
+            map_origin : map_origin,
+            serverName : serverName,
+            actionName : actionName,
+            rootObject : viewer.scene
+          });
+        });
+      }
+
+      function addAnnotator(viewer,gridClient) {
+        var annotator;
+
+        gridClient.on('change', function(map_origin) {
+            annotator = new ANNOTATOR.Circle({
+              ros: ros,
+              map_origin : map_origin,
+              rootObject : viewer.scene
+            });
+        });
+      }
+
+
+      function settingROSCallbacks()                      
+      {
+        ros.on('connection',function() {
+          console.log("Connected");
+          // subscribe to order list
+                                                     
+          $('#connectbtn').attr('disabled',true);
+          $('#focusedInput').attr('disabled',true);
+        }
+        );
+        ros.on('error',function(e) {
+          console.log("Error!",e);
+        }
+        );
+                                                     
+        ros.on('close',function() {
+          console.log("Connection Close!");
+          $('#connectbtn').attr('disabled',false);
+          $('#focusedInput').attr('disabled',false);
+        }
+        );
+      }
+
+    </script>
+  </head>
+  <body>
+    <!-- Header -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <img class="brand" style="height:35px; width:120px;" src="img/rocon_logo.png"></img>
+          <a class="brand" href="#" style="margin-top:6px">Rocon WebNotator</a>
+          <p class="input-prepend navbar-text pull-right" style="margin-top:7px">
+            <input class="input-large" id="focusedInput" type="text" value="ws://localhost:9090"></input>
+            <button id="connectbtn" class="btn btn-primary btn-normal" data-loading-text="Connecting...">Connect</button>
+          </p>
+        </div>
+      </div>
+
+    <!-- Visualizer -->
+    <div class="row-fluid">
+      <div class="span12" id="view"></div>
+    </div>
+  </body>
+</html>
