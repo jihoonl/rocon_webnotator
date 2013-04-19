@@ -36,16 +36,28 @@ ANNOTATOR.Circle= function(options) {
   this.rootObject.addEventListener('mousedown',function(event) {
     // convert to ROS coordinates
     var pose = getPose(event);
-    console.log(pose);
+    var mouse_ondrag = false;
+
+    event.onMouseMove = function(move_event) {
+      var move_pose = getPose(event);
+
+      mouse_ondrag = true;
+      console.log('move');
+
+    }
+    event.onMouseUp = function(up_event) {
+
+      if(mouse_ondrag) {
+        console.log('up');
+      }
+    }
+
   });
 
-  this.rootObject.addEventListener('mousemove',function(event) {
-    var pose = getPose(event);
-    console.log('move',pose);
-  });
+
+
+
 
   this.rootObject.addEventListener('mouseup',function(event) {
-    var pose = getPose(event);
-    console.log('up',pose);
   });
 }
