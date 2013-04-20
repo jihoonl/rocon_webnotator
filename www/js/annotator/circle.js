@@ -53,8 +53,10 @@ ANNOTATOR.Circle= function(options) {
 
       move_pose.position.subtract(pose.position);
       var mag = Math.sqrt(move_pose.position.x * move_pose.position.x  + move_pose.position.y * move_pose.position.y);
+      console.log(mag);
 
       if(mouse_ondrag) {
+        circle.graphics.clear();
         circle.graphics.beginFill("red").drawCircle(0,0,mag);
         circle.x = pose.position.x - map_origin.position.x;
         circle.y = -(pose.position.y - map_origin.position.y);
