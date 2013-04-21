@@ -31,6 +31,7 @@
       var ros = new ROSLIB.Ros();
       var defaultUrL = 'ws://192.168.10.129:9090';
       var viewer;
+      var gridClient;
 
       $().ready(function(e) {
 
@@ -79,6 +80,7 @@
           var height = half_window < 500?500:half_window;
 
           viewer.resizeCanvas(div.width()-30,height);
+          viewer.scaleToDimensions(gridClient.currentGrid.width, gridClient.currentGrid.height);
         });
 
         return viewer;
@@ -87,7 +89,7 @@
       function addMap(viewer) {
         var continuous = true;
 
-        var gridClient = new ROS2D.OccupancyGridClient({
+        gridClient = new ROS2D.OccupancyGridClient({
           ros : ros,
           rootObject : viewer.scene,
           continuous : continuous,

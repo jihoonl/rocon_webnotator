@@ -75,6 +75,7 @@ ANNOTATOR.Circle= function(options) {
 
       if(mouse_ondrag) {
         console.log('up');
+        that.rootObject.removeChild(circle);
       }
     }
 
