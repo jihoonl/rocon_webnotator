@@ -47,6 +47,8 @@ ANNOTATOR.Circle= function(options) {
     var pose = getPose(event);
     var mouse_ondrag = false;
     var circle;
+    var x = pose.position.x - map_origin.position.x;
+    var y = -(pose.position.y - map_origin.position.y);
 
     event.onMouseMove = function(move_event) {
       var move_pose = getPose(move_event);
@@ -58,31 +60,28 @@ ANNOTATOR.Circle= function(options) {
       if(mouse_ondrag) {
         circle.graphics.clear();
         circle.graphics.beginFill("red").drawCircle(0,0,mag);
-        circle.x = pose.position.x - map_origin.position.x;
-        circle.y = -(pose.position.y - map_origin.position.y);
+        circle.x = x;
+        circle.y = y; 
       }
       else {
-        var x = pose.position.x - map_origin.position.x;
-        var y = -(pose.position.y - map_origin.position.y);
         circle = createCircle(x,y,mag);
         mouse_ondrag = true;
         that.rootObject.addChild(circle);
       }
-      console.log('move');
-
     }
     event.onMouseUp = function(up_event) {
 
       if(mouse_ondrag) {
-        console.log('up');
+        var up_pose = getPose(up_event);
+
+        up_pose.position.subtract(pose.position);
+        var mag = Math.sqrt(up_pose.position.x * up_pose.position.x  + up_pose.position.y * up_pose.position.y);
+
+        that.emit('add',{x:x,y:y,radius:mag});
         that.rootObject.removeChild(circle);
       }
     }
-
-
-  });
-
-
-  this.rootObject.addEventListener('mouseup',function(event) {
   });
 }
+
+ANNOTATOR.Circle.prototype.__proto__ = EventEmitter2.prototype;
