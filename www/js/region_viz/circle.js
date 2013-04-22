@@ -63,7 +63,7 @@ REGIONVIZ.Circle = function(options) {
   }
 
   var cleanup = function() {
-    console.log(that.circles);
+//    console.log(that.circles);
     for(var c in that.circles)
     {
       that.rootObject.removeChild(that.circles[c]);
