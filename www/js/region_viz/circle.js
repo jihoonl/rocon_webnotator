@@ -15,6 +15,8 @@ REGIONVIZ.Circle = function(options) {
   that.worldlib = options.worldlib || new Worldlib({ ros: options.ros});
   that.circles = {};
   that.new_circles = {};
+  that.texts = {};
+  that.new_texts = {};
 
   var stage;
   if (that.rootObject instanceof createjs.Stage) {
@@ -23,13 +25,27 @@ REGIONVIZ.Circle = function(options) {
     stage = that.rootObject.getStage();
   }
 
-  var createCircle = function(x,y,radius) {
+  var createCircle = function(x,y,radius,id,name) {
     var circle = new createjs.Shape();
     circle.graphics.beginFill(that.color).drawCircle(0,0,radius);
     circle.x = x;
     circle.y = y;
+    circle.instance_id = id;
+    circle.instance_name = name;
 
     return circle;
+  }
+
+  var createText = function(x,y,text)
+  {
+    var text_object = new createjs.Text(text,"1px Arial","#ff7700");
+    text_object.x = x;
+    text_object.y = y;
+    text_object.scaleX = 0.3;
+    text_object.scaleY = 0.3;
+    text_object.textBaseline = "center";
+    text_object.maxWidth = 3;
+    return text_object;
   }
 
   var updates = function() {
@@ -54,32 +70,43 @@ REGIONVIZ.Circle = function(options) {
       var instance = parse_desc.instance;
       var region = JSON.parse(description.descriptors[0].data);
       var radius = region['radius'];
-      var xy = stage.rosToGlobal(instance.pose.pose.pose.position.x, instance.pose.pose.pose.position.y);
-      var x = instance.pose.pose.pose.position.x;
-      var y = instance.pose.pose.pose.position.y;
-       
-      that.new_circles[instance.instance_id] = createCircle(x,y,radius);
+      var x = instance.pose.pose.pose.position.x - map_origin.position.x;
+      var y = -(instance.pose.pose.pose.position.y - map_origin.position.y);
+      
+      that.new_texts[instance.instance_id] = createText(x,y,instance.instance_id);
+      that.new_circles[instance.instance_id] = createCircle(x,y,radius,instance.instance_id,instance.name);
     }
   }
 
   var cleanup = function() {
-//    console.log(that.circles);
     for(var c in that.circles)
     {
-      that.rootObject.removeChild(that.circles[c]);
+      if(!(c in that.new_circles)) {
+        that.rootObject.removeChild(that.texts[c]);
+        that.rootObject.removeChild(that.circles[c]);
+        delete that.texts[c];
+        delete that.circles[c];
+      }
     }
     for(var c in that.new_circles)
     {
-      that.new_circles[c].x = that.new_circles[c].x  - map_origin.position.x;
-      that.new_circles[c].y = -(that.new_circles[c].y - map_origin.position.y);
-      that.new_circles[c].rotation = stage.rosQuaternionToGlobalTheta({x:0,y:0,z:0,w:1});
-
-      that.rootObject.addChild(that.new_circles[c]);
+      if(!(c in that.circles)) {
+        that.texts[c] = that.new_texts[c];
+        that.circles[c] = that.new_circles[c];
+        that.rootObject.addChild(that.circles[c]);
+        that.rootObject.addChild(that.texts[c]);
+      }
     }
-    that.circles = that.new_circles;
+
+    that.emit('update',that.circles);
     that.new_circles = {};
+    that.new_texts = {}
   }
 
   window.setInterval(updates,1000);
+ // window.setTimeout(cleanup,5000);
   window.setInterval(cleanup,1000);
 };
+
+
+REGIONVIZ.Circle.prototype.__proto__ = EventEmitter2.prototype;

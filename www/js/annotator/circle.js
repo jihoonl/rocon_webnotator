@@ -42,7 +42,15 @@ ANNOTATOR.Circle= function(options) {
     return circle;
   }
 
+  this.clear = function()
+  {
+    that.rootObject.removeChild(that.circle);
+    that.circle = null;
+    that.selected = null;
+  }
+
   this.rootObject.addEventListener('mousedown',function(event) {
+    that.clear();
     // convert to ROS coordinates
     var pose = getPose(event);
     var mouse_ondrag = false;
@@ -73,12 +81,20 @@ ANNOTATOR.Circle= function(options) {
 
       if(mouse_ondrag) {
         var up_pose = getPose(up_event);
-
         up_pose.position.subtract(pose.position);
         var mag = Math.sqrt(up_pose.position.x * up_pose.position.x  + up_pose.position.y * up_pose.position.y);
 
+        circle.graphics.clear();
+        circle.graphics.beginFill("red").drawCircle(0,0,mag);
+        circle.x = x;
+        circle.y = y; 
+
+        that.circle = circle;
         that.emit('add',{x:x,y:y,radius:mag});
-        that.rootObject.removeChild(circle);
+
+        var ox = pose.position.x;
+        var oy = pose.position.y;
+        that.selected = {x:ox,y:oy,radius:mag};
       }
     }
   });
