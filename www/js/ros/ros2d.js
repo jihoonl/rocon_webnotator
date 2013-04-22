@@ -47,6 +47,26 @@ createjs.Stage.prototype.rosQuaternionToGlobalTheta = function(orientation) {
   return -deg;
 };
 
+// degrees to quaternion
+createjs.Stage.prototype.globalThetaTorosQuaternion = function(theta) {
+  var rad = -((theta - 90) * Math.PI / 180);
+
+  var halfyaw = rad * 0.5;
+  var cosyaw = Math.cos(halfyaw);
+  var sinyaw = Math.sin(halfyaw);
+  var cospitch = 1;
+  var sinpitch = 0;
+  var cosroll = 1;
+  var sinroll = 0;
+  
+  return {  x : sinroll * cospitch * cosyaw - cosroll * sinpitch * sinyaw, // x
+            y : cosroll * sinpitch * cosyaw + sinroll * cospitch * sinyaw, // y
+            z : cosroll * cospitch * sinyaw - sinroll * sinpitch * cosyaw, // z
+            w : cosroll * cospitch * cosyaw + sinroll * sinpitch * sinyaw, // w
+          };
+
+};
+
 /**
  * @author Russell Toris - rctoris@wpi.edu
  */
