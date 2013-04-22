@@ -3,7 +3,7 @@
   var isArray = Array.isArray ? Array.isArray : function _isArray(obj) {
     return Object.prototype.toString.call(obj) === "[object Array]";
   };
-  var defaultMaxListeners = 10;
+  var defaultMaxListeners = 50;
 
   function init() {
     this._events = {};

@@ -14,8 +14,11 @@
     <script type="text/javascript" src="js/ros/roslib.js"></script>
     <script type="text/javascript" src="js/ros/ros2d.js"></script>
     <script type="text/javascript" src="js/ros/nav2d.js"></script>
+    <script type="text/javascript" src="js/ros/worldlib.js"></script>
     <script type="text/javascript" src="js/annotator/annotator.js"></script>
     <script type="text/javascript" src="js/annotator/circle.js"></script>
+    <script type="text/javascript" src="js/region_viz/regionviz.js"></script>
+    <script type="text/javascript" src="js/region_viz/circle.js"></script>
 
     <!-- Le styles -->
     <link href="css/bootstrap.css" rel="stylesheet"></link>
@@ -32,6 +35,7 @@
       var defaultUrL = 'ws://192.168.10.129:9090';
       var viewer;
       var gridClient;
+      var circle_region_poller;
 
       $().ready(function(e) {
 
@@ -58,6 +62,7 @@
         gridClient = addMap(viewer);
         addNavigator(viewer,gridClient);
         addAnnotator(viewer,gridClient);
+        addRegionViz(viewer,gridClient);
       }
 
       function createViewer() {
@@ -65,7 +70,7 @@
         div.css('margin','10pt');
 
         var width = div.width() - 30;
-        var half_window = $(window).height()/2;
+        var half_window = $(window).height() - 200;
         var height = half_window < 500?500:half_window;
 
         viewer = new ROS2D.Viewer({
@@ -128,6 +133,21 @@
               map_origin : map_origin,
               rootObject : viewer.scene
             });
+        });
+      }
+
+      function addRegionViz(viewer,gridClient)
+      {
+        var worldlib = new Worldlib({ ros: ros});
+
+        gridClient.on('change', function(map_origin) {
+          circle_region_poller = new REGIONVIZ.Circle({
+            ros: ros,
+            map_origin : map_origin,
+            worldlib : worldlib,
+            instance_tags : ['concert','table'],
+            rootObject : viewer.scene
+          });
         });
       }
 

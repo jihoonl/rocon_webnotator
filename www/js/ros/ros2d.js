@@ -17,6 +17,16 @@ createjs.Stage.prototype.globalToRos = function(x, y) {
   };
 };
 
+createjs.Stage.prototype.rosToGlobal = function(x,y) {
+  var globalX = x  * this.scaleX;
+  var globalY = this.y - (y * this.scaleY);
+
+  return {
+    x : globalX,
+    y : globalY
+  };
+};
+
 // convert a ROS quaternion to theta in degrees
 createjs.Stage.prototype.rosQuaternionToGlobalTheta = function(orientation) {
   // convert to radians
