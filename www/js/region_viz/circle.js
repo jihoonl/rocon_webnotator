@@ -25,7 +25,7 @@ REGIONVIZ.Circle = function(options) {
 
   var createCircle = function(x,y,radius) {
     var circle = new createjs.Shape();
-    circle.graphics.beginFill(that.color).drawCircle(0,0,radius/2);
+    circle.graphics.beginFill(that.color).drawCircle(0,0,radius);
     circle.x = x;
     circle.y = y;
 
