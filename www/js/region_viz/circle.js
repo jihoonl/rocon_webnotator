@@ -38,13 +38,14 @@ REGIONVIZ.Circle = function(options) {
 
   var createText = function(x,y,text)
   {
-    var text_object = new createjs.Text(text,"1px Arial","#ff7700");
+    var text_object = new createjs.Text(text,"20px Arial","#000000");
     text_object.x = x;
     text_object.y = y;
-    text_object.scaleX = 0.3;
-    text_object.scaleY = 0.3;
+    text_object.scaleX = 1/ stage.scaleX;//0.3;
+    text_object.scaleY = 1/stage.scaleY;//0.3;
     text_object.textBaseline = "center";
-    text_object.maxWidth = 3;
+//    text_object.lineWidth = 30;
+//    text_object.maxWidth = 30;
     return text_object;
   }
 
@@ -73,7 +74,7 @@ REGIONVIZ.Circle = function(options) {
       var x = instance.pose.pose.pose.position.x - map_origin.position.x;
       var y = -(instance.pose.pose.pose.position.y - map_origin.position.y);
       
-      that.new_texts[instance.instance_id] = createText(x,y,instance.instance_id);
+      that.new_texts[instance.instance_id] = createText(x,y,instance.name);
       that.new_circles[instance.instance_id] = createCircle(x,y,radius,instance.instance_id,instance.name);
     }
   }

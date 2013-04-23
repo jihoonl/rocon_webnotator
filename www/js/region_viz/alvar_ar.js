@@ -71,13 +71,12 @@ REGIONVIZ.AlvarAR = function(options) {
 
   var createText = function(x,y,text)                                 
   {
-    var text_object = new createjs.Text(text,"1px Arial","#0000ff");
+    var text_object = new createjs.Text(text,"30px Arial","#000000");
     text_object.x = x;
     text_object.y = y;
-    text_object.scaleX = 0.4;
-    text_object.scaleY = 0.4;
+    text_object.scaleX = 1 / stage.scaleX;
+    text_object.scaleY = 1 / stage.scaleY;
     text_object.textBaseline = "center";
-    text_object.maxWidth = 3;
     return text_object;
   }
 
