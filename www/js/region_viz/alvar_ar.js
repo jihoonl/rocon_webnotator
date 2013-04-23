@@ -11,7 +11,7 @@ REGIONVIZ.AlvarAR = function(options) {
   that.rootObject = options.rootObject;
   var map_origin = options.map_origin;
   that.instance_tags = options.instance_tags;
-  that.color = "red";
+  that.color = createjs.Graphics.getRGB(0,154,205,0.8);
   that.worldlib = options.worldlib || new Worldlib({ ros: options.ros});
   that.markers = {};
   that.new_markers = {};
@@ -43,7 +43,7 @@ REGIONVIZ.AlvarAR = function(options) {
     var m = new ROS2D.NavigationArrow({
       size : 20,
       strokeSize : 1,
-      fillColor : createjs.Graphics.getRGB(255, 64, 128, 1.0),
+      fillColor : that.color,
       pulse : false
     });
 
