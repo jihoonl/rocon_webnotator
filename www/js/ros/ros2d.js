@@ -67,6 +67,39 @@ createjs.Stage.prototype.globalThetaTorosQuaternion = function(theta) {
 
 };
 
+
+// RPY to quaternion
+createjs.Stage.prototype.globalRPYTorosQuaternion = function(roll,pitch,yaw) {
+  var halfyaw = yaw * 0.5;
+  var halfroll = roll * 0.5;
+  var halfpitch = pitch * 0.5;
+  var cosyaw = Math.cos(halfyaw);
+  var sinyaw = Math.sin(halfyaw);
+  var cospitch = Math.cos(halfpitch);
+  var sinpitch = Math.sin(halfpitch);
+  var cosroll = Math.cos(halfroll);
+  var sinroll = Math.sin(halfroll);
+  
+  return {  x : sinroll * cospitch * cosyaw - cosroll * sinpitch * sinyaw, // x
+            y : cosroll * sinpitch * cosyaw + sinroll * cospitch * sinyaw, // y
+            z : cosroll * cospitch * sinyaw - sinroll * sinpitch * cosyaw, // z
+            w : cosroll * cospitch * cosyaw + sinroll * sinpitch * sinyaw, // w
+          };
+};
+
+createjs.Stage.prototype.rosQuaternionToGlobalRPY = function(q) {
+  var roll  = Math.atan2(q.w * q.x + q.y * q.z, 1 - 2 * (q.x * q.x + q.y * q.y));
+  var pitch = Math.asin(2 * ( q.w * q.y - q.z * q.x));
+  var yaw   = Math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z));
+
+  return {roll : roll,
+          pitch: pitch,
+          yaw : yaw};
+};
+
+
+
+
 /**
  * @author Russell Toris - rctoris@wpi.edu
  */

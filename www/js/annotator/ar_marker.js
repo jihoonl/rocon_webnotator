@@ -79,12 +79,23 @@ ANNOTATOR.AlvarAr= function(options) {
         var angle = Math.atan2((up_pose.position.y - pose.position.y), (up_pose.position.x- pose.position.x));
         marker.rotation = - angle * 180 / Math.PI + 90;
 
-        var orientation = stage.globalThetaTorosQuaternion(marker.rotation);
+        var quaternion = new ROSLIB.Quaternion();
+        var yaw_180 = new ROSLIB.Quaternion({ x : 0, y : 0,z : 1, w : 0});
+        var roll_180 = new ROSLIB.Quaternion({ x : 1, y : 0,z : 0, w : 0});
+        quaternion.multiply(yaw_180);
+        quaternion.multiply(yaw_180);
+        quaternion.multiply(roll_180);
+
+        angle -= (Math.PI/2);
+
+        var orientation = stage.globalRPYTorosQuaternion(0,angle,0);
+        quaternion.multiply(orientation);
+        quaternion.normalize();
         var ox = pose.position.x;
         var oy = pose.position.y;
 
-        that.emit('add',{x:ox,y:oy,orientation: orientation});        
-        that.selected ={x:ox,y:oy,orientation: orientation};
+        that.emit('add',{x:ox,y:oy,orientation: quaternion});        
+        that.selected ={x:ox,y:oy,orientation: quaternion};
         that.marker = marker;
       }
     }

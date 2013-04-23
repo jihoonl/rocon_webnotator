@@ -49,7 +49,20 @@ REGIONVIZ.AlvarAR = function(options) {
 
     m.x = x;
     m.y = y;
-    m.rotation = stage.rosQuaternionToGlobalTheta(orientation); 
+
+    var quaternion = new ROSLIB.Quaternion(orientation);
+    var yaw_n180 = new ROSLIB.Quaternion({ x : 0, y : 0,z : 1, w : 0});
+    var roll_n180 = new ROSLIB.Quaternion({ x : 1, y : 0,z : 0, w : 0});
+
+    yaw_n180.invert();
+    roll_n180.invert();
+    
+    quaternion.multiply(roll_n180);
+    quaternion.multiply(yaw_n180);
+    quaternion.multiply(yaw_n180);
+
+    var rpy = stage.rosQuaternionToGlobalRPY(quaternion);
+    m.rotation = -rpy.yaw * 180 / Math.PI;
     m.scaleX = 1.0 / stage.scaleX;
     m.scaleY = 1.0 / stage.scaleY;
 
