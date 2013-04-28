@@ -19,6 +19,7 @@
     <script type="text/javascript" src="js/region_viz/regionviz.js"></script>
     <script type="text/javascript" src="js/region_viz/circle.js"></script>
     <script type="text/javascript" src="js/region_viz/alvar_ar.js"></script>
+    <script type="text/javascript" src="js/model/OccupancyGridSrvClient.js"></script>
 
     <!-- Le styles -->
     <link href="css/bootstrap.css" rel="stylesheet"></link>
@@ -32,7 +33,7 @@
 
     <script type="text/javascript">
       var ros = new ROSLIB.Ros();
-      var defaultUrL = 'ws://192.168.10.129:9090';
+      var defaultUrL = 'ws://192.168.10.129:9091';
       var viewer;
       var gridClient;
       var circle_region_poller;
@@ -98,8 +99,8 @@
         div.css('margin','10pt');
 
         var width = div.width() - 30;
-        var half_window = $(window).height() - 500;
-        var height = half_window < 500?500:half_window;
+        var half_window = $(window).height() - 300;
+        var height = half_window < 200?200:half_window;
 
         viewer = new ROS2D.Viewer({
           divID : 'view',
@@ -115,8 +116,8 @@
 
 
         $(window).resize(function(e) {
-          var half_window = $(window).height()/2;
-          var height = half_window < 500?500:half_window;
+          var half_window = $(window).height() - 300;
+          var height = half_window < 200?200:half_window;
 
           viewer.resizeCanvas(div.width()-30,height);
           viewer.scaleToDimensions(gridClient.currentGrid.width, gridClient.currentGrid.height);
@@ -126,12 +127,11 @@
       }
 
       function addMap(viewer) {
-        var continuous = true;
+        var continuous = false;
 
-        gridClient = new ROS2D.OccupancyGridClient({
+        gridClient = new ROS2D.OccupancyGridSrvClient({
           ros : ros,
           rootObject : viewer.scene,
-          continuous : continuous,
         });
 
         // Scale the canvas to fit to the map
@@ -341,7 +341,7 @@
           <img class="brand" style="height:35px; width:120px;" src="img/rocon_logo.png"></img>
           <a class="brand" href="#" style="margin-top:6px">Rocon WebNotator</a>
           <p class="input-prepend navbar-text pull-right" style="margin-top:7px">
-            <input class="input-large" id="focusedInput" type="text" value="ws://192.168.10.129:9090"></input>
+            <input class="input-large" id="focusedInput" type="text" value="ws://192.168.10.129:9091"></input>
             <button id="connectbtn" class="btn btn-primary btn-normal" data-loading-text="Connecting...">Connect</button>
           </p>
         </div>
